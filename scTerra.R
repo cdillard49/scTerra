@@ -36,14 +36,25 @@ metadata_51$condition <- as.factor(metadata_51$condition)
 
 dds <- DESeqDataSetFromMatrix(countData = express_mat_51, colData = metadata_51, 
                               design = ~ condition)
+#create the deseq object
 dds$condition <- relevel(dds$condition, ref = "A")
+#set condition
+#here we set as A, but in the future will set condition appropriately
 dds <- DESeq(dds)
+#initialize the differential expression
 res <- results(dds, independentFiltering = FALSE)
+#initialize the results, with no filtering
 res[order(res$padj),]
+#view results by order of adjusted p-value
 summary(results(dds, alpha=0.05))
+#view summary of results that match alpha <0.05
 normalized_counts <- counts(dds, normalized=TRUE)
+#normalize counts variable
 head(normalized_counts)
+#view the normalized counts
 
 resLFC<- lfcShrink(dds, coef="condition_B_vs_A", type = "normal", lfcThreshold = 1, alpha = 0.05)
 plotMA(resLFC, ylim=c(-2,2), cex=.4)
 plotMA(res, ylim=c(-2,2),cex=.4)
+#visualize with MA plot
+#logfold change shrinkage vs un-shrunk
