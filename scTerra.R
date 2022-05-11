@@ -34,14 +34,16 @@ metadata_51 <- data.frame(
 metadata_51$condition <- as.factor(metadata_51$condition)
 #metadata creation, change the condition column to match SNV condition
 
-pasCts <- system.file("extdata",
-                      "pasilla_gene_counts.tsv",
-                      package="pasilla", mustWork=TRUE)
-pasAnno <- system.file("extdata",
-                       "pasilla_sample_annotation.csv",
-                       package="pasilla", mustWork=TRUE)
-cts <- as.matrix(read.csv(pasCts,sep="\t",row.names="gene_id"))
-coldata <- read.csv(pasAnno, row.names=1)
-coldata <- coldata[,c("condition","type")]
-coldata$condition <- factor(coldata$condition)
-coldata$type <- factor(coldata$type)
+dds <- DESeqDataSetFromMatrix(countData = express_mat_51, colData = metadata_51, 
+                              design = ~ condition)
+dds$condition <- relevel(dds$condition, ref = "A")
+dds <- DESeq(dds)
+res <- results(dds, independentFiltering = FALSE)
+res[order(res$padj),]
+summary(results(dds, alpha=0.05))
+normalized_counts <- counts(dds, normalized=TRUE)
+head(normalized_counts)
+
+resLFC<- lfcShrink(dds, coef="condition_B_vs_A", type = "normal", lfcThreshold = 1, alpha = 0.05)
+plotMA(resLFC, ylim=c(-2,2), cex=.4)
+plotMA(res, ylim=c(-2,2),cex=.4)
