@@ -44,8 +44,8 @@ dds <- DESeq(dds)
 #initialize the differential expression
 res <- results(dds, independentFiltering = FALSE)
 #initialize the results, with no filtering
-res[order(res$padj),]
-#view results by order of adjusted p-value
+res <- res[order(res$padj),]
+#results by order of adjusted p-value
 summary(results(dds, alpha=0.05))
 #view summary of results that match alpha <0.05
 normalized_counts <- counts(dds, normalized=TRUE)
