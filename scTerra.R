@@ -13,7 +13,7 @@ express_mat_51 <- read.delim("inputs/SRR10018151_GE_matrix_filtered.txt", row.na
 #1802 cell barcodes
 redi_cos_51 <- read.delim("inputs/SRR10018151_ind_ss_redi_cos.txt")
 #17210 snvs each with corresponding cell barcodes
-#many SNVs found in different cells
+#many snvss found in different cells
 barcodelist <- colnames(express_mat_51) 
 #list of barcodes to use for filtering
 redi_separate_51 <- separate_rows(redi_cos_51, Cells, convert = TRUE)
