@@ -1,3 +1,3 @@
 # scTerra
 
-# Rscript for identifying and comparing scTerra reads
+# Rscripts for identifying and comparing scTerra reads
