@@ -6,9 +6,14 @@ BiocManager::install("DESeq2")
 library(tidyr)
 library(dplyr)
 library(DESeq2)
+library(EnhancedVolcano)
 setwd("~/GitHub/scTerra")
+#end_reads_50 <- read.delim("inputs/end_reads_barcodes50")
 
-end_reads_50 <- read.delim("inputs/end_reads_barcodes50")
+snv_input <- read.delim("example.txt/tsv") ##Not Ran
+#file needs to have column with SNV and row with SNV location/coordinates
+snv_list <- snv_input$SNV ##Not Ran
+
 express_mat_51 <- read.delim("inputs/SRR10018151_GE_matrix_filtered.txt", row.names = 1)
 #1802 cell barcodes
 redi_cos_51 <- read.delim("inputs/SRR10018151_ind_ss_redi_cos.txt")
@@ -16,9 +21,11 @@ redi_cos_51 <- read.delim("inputs/SRR10018151_ind_ss_redi_cos.txt")
 #many snvss found in different cells
 barcodelist <- colnames(express_mat_51) 
 #list of barcodes to use for filtering
-filt_redi_51 <- subset(redi_cos_51, subset=(N_cells >= 10))
+----
+#redi_cos_51 <- subset(redi_cos_51, subset=(N_cells >= 10))
 #remove low cell count (10)
-redi_separate_51 <- separate_rows(filt_redi_51, Cells, convert = TRUE)
+----
+redi_separate_51 <- separate_rows(redi_cos_51, Cells, convert = TRUE)
 #separate out/expand the Cells column
 #note this breaks the N_cells column for now
 filt_sub_redi_51 <- redi_separate_51 %>% filter(Cells %in% barcodelist)
@@ -26,7 +33,7 @@ filt_sub_redi_51 <- redi_separate_51 %>% filter(Cells %in% barcodelist)
 
 
 #DESEQ2 GE using cells with specific SNVs
-#line 30: change the SNV to the desired SNV of choice
+#line 33: change the SNV to the desired SNV of choice
 snv <- filt_sub_redi_51[filt_sub_redi_51$SNV %in% c("1:100291620_T>G"), ]
 snv_cells_A <- snv$Cells
 #A is chosen SNV
@@ -72,8 +79,14 @@ normalized_counts <- counts(dds, normalized=TRUE)
 head(normalized_counts)
 #view the normalized counts
 
-resLFC<- lfcShrink(dds, coef="condition_A_vs_B", type = "normal", lfcThreshold = 1, alpha = 0.05)
+resLFC<- lfcShrink(dds, coef="condition_A_vs_B", type = "normal", lfcThreshold = 1)
 plotMA(resLFC, ylim=c(-2,2), cex=.4)
 plotMA(res, ylim=c(-2,2),cex=.4)
+EnhancedVolcano(resLFC, lab=rownames(resLFC), x="log2FoldChange", y= "pvalue", 
+                title = "Normal vs. SNV" ,xlab = bquote(~Log[2]~ "fold change"), 
+                colAlpha = .5, pointSize = 1.0, labSize = 3.0, col = c("black", "blue", "green", "red"), 
+                legendPosition = "right" )
+
 #visualize with MA plot
 #logfold change shrinkage vs un-shrunk
+#volcanoPlots
