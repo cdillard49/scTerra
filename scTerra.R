@@ -2,6 +2,7 @@ if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 
 BiocManager::install("DESeq2")
+devtools::install_github('kevinblighe/EnhancedVolcano')
 require(data.table)
 library(tidyr)
 library(dplyr)
@@ -41,7 +42,7 @@ snv_cells_A <- snv$Cells
 #A is chosen SNV
 snv_cells_B <- barcodelist[!barcodelist %in% snv_cells_A]
 #B is all other SNVs
-#filtering out only those snvs selected and setting the condition for dseq as A
+#filtering out only those snvs selected and setting the condition for deseq as A
 snv_cells_A <- as.data.frame(snv_cells_A)
 snv_cells_B <- as.data.frame(snv_cells_B)
 snv_cells_A$condition <- "A"
@@ -94,26 +95,33 @@ file_name_plotMA <- gsub(":|>", "_", file_name_plotMA)
 file_name_volcano_shrink <- paste0("outputs/", sample_name, "_DE_Volcano_", input, ".pdf")
 file_name_volcano_shrink <- gsub(":|>", "_", file_name_volcano_shrink)
 #file name format for all plots and gene table, removing ":" and ">"
+
 write.table(x = output_gene, file = file_name_genes, quote = FALSE, sep = "\t")
 #write gene table to file
 
 resLFC<- lfcShrink(dds, coef="condition_A_vs_B", type = "normal", lfcThreshold = 1)
-pdf(file = file_name_plotMA_shrink)
-plotMA(resLFC, ylim=c(-2,2), cex=.4)
-dev.off()
-pdf(file = file_name_plotMA)
-plotMA(res, ylim=c(-2,2),cex=.4)
-dev.off()
+#apply lfcShrink to results
 
 pdf(file = file_name_volcano_shrink)
-EnhancedVolcano(resLFC, lab=rownames(resLFC), x="log2FoldChange", y= "pvalue", 
+p <- EnhancedVolcano(resLFC, lab=rownames(resLFC), x="log2FoldChange", y= "pvalue", 
                 title = "Normal vs. SNV" ,xlab = bquote(~Log[2]~ "fold change"), 
                 colAlpha = .5, pointSize = 1.0, labSize = 3.0, col = c("black", "blue", "green", "red"), 
                 legendPosition = "right",
                 legendLabSize = 10.0,
                 legendIconSize = 3.0)
+print(p)
 dev.off()
-print(paste0("SNV ", input, " Finished."))
+
+pdf(file = file_name_plotMA_shrink)
+plotMA(resLFC, ylim=c(-2,2), cex=.4)
+dev.off()
+
+pdf(file = file_name_plotMA)
+plotMA(res, ylim=c(-2,2),cex=.4)
+dev.off()
+
+
+print(paste0("SNV ", input, " finished."))
 #visualize with MA plot
 #logfold change shrinkage vs un-shrunk
 #volcanoPlots
