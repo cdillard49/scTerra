@@ -9,6 +9,7 @@ library(DESeq2)
 library(EnhancedVolcano)
 setwd("~/GitHub/scTerra")
 sample_name <- "SRR10018151"
+
 #use to generate variable for naming later, only use sample name that matches
 # the one from line 19
 snv_input <- read.delim("inputs/example.txt")
@@ -103,6 +104,7 @@ dev.off()
 pdf(file = file_name_plotMA)
 plotMA(res, ylim=c(-2,2),cex=.4)
 dev.off()
+
 pdf(file = file_name_volcano_shrink)
 EnhancedVolcano(resLFC, lab=rownames(resLFC), x="log2FoldChange", y= "pvalue", 
                 title = "Normal vs. SNV" ,xlab = bquote(~Log[2]~ "fold change"), 
@@ -111,7 +113,7 @@ EnhancedVolcano(resLFC, lab=rownames(resLFC), x="log2FoldChange", y= "pvalue",
                 legendLabSize = 10.0,
                 legendIconSize = 3.0)
 dev.off()
-
+print(paste0("SNV ", input, " Finished."))
 #visualize with MA plot
 #logfold change shrinkage vs un-shrunk
 #volcanoPlots
