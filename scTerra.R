@@ -96,7 +96,7 @@ file_name_volcano_shrink <- paste0("outputs/", sample_name, "_DE_Volcano_", inpu
 file_name_volcano_shrink <- gsub(":|>", "_", file_name_volcano_shrink)
 #file name format for all plots and gene table, removing ":" and ">"
 
-write.table(x = output_gene, file = file_name_genes, quote = FALSE, sep = "\t")
+write.table(x = output_gene, file = file_name_genes, quote = FALSE, sep = "\t", col.names = NA)
 #write gene table to file
 
 resLFC<- lfcShrink(dds, coef="condition_A_vs_B", type = "normal", lfcThreshold = 1)
