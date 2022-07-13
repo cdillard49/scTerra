@@ -3,6 +3,7 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install("DESeq2")
 devtools::install_github('kevinblighe/EnhancedVolcano')
+
 require(data.table)
 library(tidyr)
 library(dplyr)
@@ -16,7 +17,6 @@ sample_name <- "SRR10018151"
 snv_input <- read.delim("inputs/example.txt")
 #file needs to have column with SNV and row with SNV location/coordinates
 snv_list <- snv_input$SNV 
-#end_reads_50 <- read.delim("inputs/end_reads_barcodes50")
 express_mat_51 <- read.delim("inputs/SRR10018151_GE_matrix_filtered.txt", row.names = 1)
 redi_cos_51 <- read.delim("inputs/SRR10018151_ind_ss_redi_cos.txt")
 barcodelist <- colnames(express_mat_51) 
@@ -104,7 +104,7 @@ resLFC<- lfcShrink(dds, coef="condition_A_vs_B", type = "normal", lfcThreshold =
 
 pdf(file = file_name_volcano_shrink)
 p <- EnhancedVolcano(resLFC, lab=rownames(resLFC), x="log2FoldChange", y= "pvalue", 
-                title = "Normal vs. SNV" ,xlab = bquote(~Log[2]~ "fold change"), 
+                pCutoff = 1, title = "Normal vs. SNV" ,xlab = bquote(~Log[2]~ "fold change"), 
                 colAlpha = .5, pointSize = 1.0, labSize = 3.0, col = c("black", "blue", "green", "red"), 
                 legendPosition = "right",
                 legendLabSize = 10.0,
